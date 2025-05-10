@@ -1,1 +1,2 @@
 # Alquiler_vuelos
+Este proyecto implementa una base de datos relacional en **PostgreSQL** para la gestión integral de una empresa de alquiler de vehículos. La solución contempla la administración de flota, clientes, oficinas, reservas, contratos de alquiler, historial de mantenimiento, tarifas por temporada, roles de usuarios y auditorías.

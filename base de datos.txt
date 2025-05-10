@@ -1,0 +1,707 @@
+alquilervehiculosdb=# CREATE TABLE Marcas (
+    id_marca SERIAL PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL UNIQUE
+);
+CREATE TABLE
+alquilervehiculosdb=# CREATE TABLE Modelos (
+    id_modelo SERIAL PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL,
+    id_marca INT REFERENCES Marcas(id_marca)
+);
+CREATE TABLE
+alquilervehiculosdb=# CREATE TABLE TiposVehiculo (
+    id_tipo SERIAL PRIMARY KEY,
+    tipo VARCHAR(50) NOT NULL UNIQUE
+);
+CREATE TABLE
+alquilervehiculosdb=# CREATE TABLE EstadosVehiculo (
+    id_estado SERIAL PRIMARY KEY,
+    estado VARCHAR(50) NOT NULL UNIQUE
+);
+CREATE TABLE
+alquilervehiculosdb=# CREATE TABLE Oficinas (
+    id_oficina SERIAL PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL,
+    direccion VARCHAR(255),
+    ciudad VARCHAR(100),
+    telefono VARCHAR(20)
+);
+CREATE TABLE
+alquilervehiculosdb=# CREATE TABLE Vehiculos (
+    id_vehiculo SERIAL PRIMARY KEY,
+    placa VARCHAR(10) NOT NULL UNIQUE,
+    id_modelo INT REFERENCES Modelos(id_modelo),
+    id_tipo INT REFERENCES TiposVehiculo(id_tipo),
+    anio INT,
+    color VARCHAR(50),
+    id_estado INT REFERENCES EstadosVehiculo(id_estado),
+    id_oficina INT REFERENCES Oficinas(id_oficina)
+);
+CREATE TABLE
+alquilervehiculosdb=# CREATE TABLE Clientes (
+    id_cliente SERIAL PRIMARY KEY,
+    nombre VARCHAR(100),
+    apellido VARCHAR(100),
+    cedula VARCHAR(15) UNIQUE,
+    correo VARCHAR(100),
+    telefono VARCHAR(20),
+    direccion VARCHAR(255)
+);
+CREATE TABLE
+alquilervehiculosdb=# CREATE TABLE Reservas (
+    id_reserva SERIAL PRIMARY KEY,
+    id_cliente INT REFERENCES Clientes(id_cliente),
+    id_vehiculo INT REFERENCES Vehiculos(id_vehiculo),
+    fecha_reserva DATE,
+    fecha_inicio DATE,
+    fecha_fin DATE,
+    estado VARCHAR(50) -- Pendiente, Confirmada, Cancelada
+);
+CREATE TABLE
+alquilervehiculosdb=# CREATE TABLE ContratosAlquiler (
+    id_contrato SERIAL PRIMARY KEY,
+    id_reserva INT REFERENCES Reservas(id_reserva),
+    fecha_inicio DATE,
+    fecha_fin DATE,
+    km_inicial INT,
+    km_final INT,
+    costo_total NUMERIC(10,2),
+    observaciones TEXT
+);
+CREATE TABLE
+alquilervehiculosdb=# CREATE TABLE Seguros (
+    id_seguro SERIAL PRIMARY KEY,
+    nombre VARCHAR(100),
+    descripcion TEXT,
+    precio NUMERIC(10,2)
+);
+CREATE TABLE
+alquilervehiculosdb=# CREATE TABLE VehiculoSeguro (
+    id_vehiculo INT REFERENCES Vehiculos(id_vehiculo),
+    id_seguro INT REFERENCES Seguros(id_seguro),
+    PRIMARY KEY (id_vehiculo, id_seguro)
+);
+CREATE TABLE
+alquilervehiculosdb=# CREATE TABLE Tarifas (
+    id_tarifa SERIAL PRIMARY KEY,
+    id_tipo INT REFERENCES TiposVehiculo(id_tipo),
+    precio_dia NUMERIC(10,2),
+    temporada VARCHAR(50) -- Alta, Baja, Media
+);
+CREATE TABLE
+alquilervehiculosdb=# CREATE TABLE Mantenimientos (
+    id_mantenimiento SERIAL PRIMARY KEY,
+    id_vehiculo INT REFERENCES Vehiculos(id_vehiculo),
+    fecha DATE,
+    descripcion TEXT,
+    costo NUMERIC(10,2),
+    realizado_por VARCHAR(100)
+);
+CREATE TABLE
+alquilervehiculosdb=# CREATE TABLE RolesUsuario (
+    id_rol SERIAL PRIMARY KEY,
+    nombre_rol VARCHAR(50) UNIQUE NOT NULL
+);
+CREATE TABLE
+alquilervehiculosdb=# CREATE TABLE Usuarios (
+    id_usuario SERIAL PRIMARY KEY,
+    username VARCHAR(50) UNIQUE,
+    password VARCHAR(100),
+    id_rol INT REFERENCES RolesUsuario(id_rol)
+);
+CREATE TABLE
+alquilervehiculosdb=# INSERT INTO Marcas (nombre) VALUES
+('Toyota'), ('Chevrolet'), ('Ford'), ('Hyundai'), ('Nissan');
+INSERT 0 5
+alquilervehiculosdb=# INSERT INTO Modelos (nombre, id_marca) VALUES
+('Corolla', 1), ('Spark GT', 2), ('F-150', 3), ('Tucson', 4), ('Versa', 5);
+INSERT 0 5
+alquilervehiculosdb=# INSERT INTO TiposVehiculo (tipo) VALUES
+('Sedan'), ('SUV'), ('Camioneta'), ('Hatchback'), ('Pickup');
+INSERT 0 5
+alquilervehiculosdb=# INSERT INTO EstadosVehiculo (estado) VALUES
+('Disponible'), ('Alquilado'), ('Mantenimiento'), ('Reservado'), ('Inactivo');
+INSERT 0 5
+alquilervehiculosdb=# INSERT INTO Oficinas (nombre, direccion, ciudad, telefono) VALUES
+('Oficina Centro', 'Calle 10 #15-30', 'Bogotá', '6011234567'),
+('Oficina Norte', 'Cra 45 #120-90', 'Bogotá', '6012345678'),
+('Sucursal Medellín', 'Av. El Poblado #35-50', 'Medellín', '6043456789'),
+('Sucursal Cali', 'Cra 70 #45-60', 'Cali', '6024567890'),
+('Sucursal Barranquilla', 'Calle 80 #50-10', 'Barranquilla', '6055678901');
+INSERT 0 5
+alquilervehiculosdb=# INSERT INTO Vehiculos (placa, id_modelo, id_tipo, anio, color, id_estado, id_oficina) VALUES
+('ABC123', 1, 1, 2020, 'Blanco', 1, 1),
+('DEF456', 2, 4, 2019, 'Rojo', 1, 2),
+('GHI789', 3, 5, 2021, 'Negro', 2, 3),
+('JKL012', 4, 2, 2022, 'Gris', 3, 4),
+('MNO345', 5, 1, 2023, 'Azul', 1, 1);
+INSERT 0 5
+alquilervehiculosdb=# INSERT INTO Clientes (nombre, apellido, cedula, correo, telefono, direccion) VALUES
+('Juan', 'Pérez', '1234567890', 'juanp@example.com', '3001112233', 'Calle 1 #2-3'),
+('Ana', 'Gómez', '2345678901', 'anag@example.com', '3002223344', 'Cra 5 #6-7'),
+('Luis', 'Martínez', '3456789012', 'luism@example.com', '3003334455', 'Av 10 #20-30'),
+('Carla', 'Rodríguez', '4567890123', 'carlar@example.com', '3004445566', 'Calle 50 #60-70'),
+('Pedro', 'Sánchez', '5678901234', 'pedros@example.com', '3005556677', 'Cra 100 #110-120');
+INSERT 0 5
+alquilervehiculosdb=# INSERT INTO Reservas (id_cliente, id_vehiculo, fecha_reserva, fecha_inicio, fecha_fin, estado) VALUES
+(1, 1, '2025-05-01', '2025-05-05', '2025-05-10', 'Confirmada'),
+(2, 2, '2025-05-02', '2025-05-07', '2025-05-09', 'Pendiente'),
+(3, 3, '2025-05-03', '2025-05-04', '2025-05-06', 'Cancelada'),
+(4, 4, '2025-05-04', '2025-05-10', '2025-05-15', 'Confirmada'),
+(5, 5, '2025-05-05', '2025-05-06', '2025-05-12', 'Confirmada');
+INSERT 0 5
+alquilervehiculosdb=# INSERT INTO ContratosAlquiler (id_reserva, fecha_inicio, fecha_fin, km_inicial, km_final, costo_total, observaciones) VALUES
+(1, '2025-05-05', '2025-05-10', 12000, 12400, 500000, 'Sin novedades'),
+(2, '2025-05-07', '2025-05-09', 8000, 8300, 300000, 'Cliente frecuente'),
+(4, '2025-05-10', '2025-05-15', 5000, 5600, 600000, 'Daño leve en puerta'),
+(5, '2025-05-06', '2025-05-12', 15000, 15700, 700000, 'Todo en orden'),
+(3, '2025-05-04', '2025-05-06', 10000, 10300, 250000, 'Cancelado');
+INSERT 0 5
+alquilervehiculosdb=# INSERT INTO Seguros (nombre, descripcion, precio) VALUES
+('Básico', 'Cobertura contra daños menores', 50000),
+('Total', 'Cobertura total de daños', 100000),
+('Robo', 'Cobertura contra hurto del vehículo', 75000),
+('Accidentes', 'Cobertura contra accidentes personales', 60000),
+('Mixto', 'Cobertura contra todo riesgo y accidentes', 120000);
+INSERT 0 5
+alquilervehiculosdb=# INSERT INTO VehiculoSeguro (id_vehiculo, id_seguro) VALUES
+(1, 1), (1, 2), (2, 3), (3, 2), (4, 4);
+INSERT 0 5
+alquilervehiculosdb=# INSERT INTO Tarifas (id_tipo, precio_dia, temporada) VALUES
+(1, 80000, 'Alta'),
+(1, 60000, 'Baja'),
+(2, 100000, 'Media'),
+(3, 120000, 'Alta'),
+(4, 70000, 'Media');
+INSERT 0 5
+alquilervehiculosdb=#
+alquilervehiculosdb=# INSERT INTO Mantenimientos (id_vehiculo, fecha, descripcion, costo, realizado_por) VALUES
+(3, '2025-04-15', 'Cambio de aceite', 80000, 'Mecánico A'),
+(4, '2025-04-18', 'Cambio de frenos', 150000, 'Mecánico B'),
+(2, '2025-04-20', 'Revisión general', 50000, 'Mecánico C'),
+(5, '2025-04-22', 'Cambio de llantas', 300000, 'Mecánico A'),
+(1, '2025-04-25', 'Lavado interno', 20000, 'Mecánico D');
+INSERT 0 5
+alquilervehiculosdb=# INSERT INTO RolesUsuario (nombre_rol) VALUES
+('cliente'), ('agente_alquiler'), ('mecanico'), ('admin_flota'), ('admin_sistema');
+INSERT 0 5
+alquilervehiculosdb=# INSERT INTO Usuarios (username, password, id_rol) VALUES
+('juancliente', 'pass123', 1),
+('anaagente', 'pass234', 2),
+('luismec', 'pass345', 3),
+('adminflota1', 'pass456', 4),
+('sistemaadmin', 'pass567', 5);
+INSERT 0 5
+alquilervehiculosdb=# CREATE INDEX idx_vehiculos_tipo ON vehiculos(id_tipo);
+CREATE INDEX
+alquilervehiculosdb=# CREATE INDEX idx_vehiculos_oficina ON vehiculos(id_oficina);
+CREATE INDEX
+alquilervehiculosdb=# CREATE INDEX idx_reservas_cliente_fecha ON reservas(id_cliente, fecha_inicio);
+CREATE INDEX
+alquilervehiculosdb=# CREATE INDEX idx_contratos_activos ON contratos_alquiler(fecha_devolucion);
+ERROR:  relation "contratos_alquiler" does not exist
+alquilervehiculosdb=# CREATE INDEX idx_contratos_activos ON contratosalquiler(fecha_fin);
+CREATE INDEX
+alquilervehiculosdb=# CREATE OR REPLACE VIEW vista_vehiculos_disponibles AS
+SELECT v.*, o.nombre AS oficina
+FROM vehiculos v
+JOIN oficinas o ON v.id_oficina = o.id_oficina
+JOIN estadosvehiculo ev ON v.id_estado = ev.id_estado
+WHERE ev.estado = 'Disponible';
+CREATE VIEW
+alquilervehiculosdb=# CREATE OR REPLACE VIEW vista_clientes_alquileres_activos AS
+SELECT DISTINCT c.*
+FROM clientes c
+JOIN reservas r ON c.id_cliente = r.id_cliente
+JOIN contratosalquiler ca ON ca.id_reserva = r.id_reserva
+WHERE ca.fecha_fin IS NULL;
+CREATE VIEW
+alquilervehiculosdb=# CREATE OR REPLACE VIEW vista_historial_alquileres_cliente AS
+SELECT
+    c.id_cliente,
+    c.nombre,
+    r.id_reserva,
+    ca.fecha_inicio,
+    ca.fecha_fin,
+    v.placa
+FROM clientes c
+JOIN reservas r ON c.id_cliente = r.id_cliente
+JOIN contratosalquiler ca ON r.id_reserva = ca.id_reserva
+JOIN vehiculos v ON r.id_vehiculo = v.id_vehiculo;
+CREATE VIEW
+alquilervehiculosdb=# CREATE OR REPLACE VIEW vista_vehiculos_mantenimiento AS
+SELECT v.*
+FROM vehiculos v
+JOIN estadosvehiculo ev ON v.id_estado = ev.id_estado
+WHERE ev.estado = 'Mantenimiento';
+CREATE VIEW
+alquilervehiculosdb=# CREATE OR REPLACE VIEW vista_detalle_contratos AS
+SELECT
+    ca.id_contrato,
+    ca.fecha_inicio,
+    ca.fecha_fin,
+    ca.km_inicial,
+    ca.km_final,
+    ca.costo_total,
+    ca.observaciones,
+    c.nombre AS cliente,
+    v.placa,
+    o.nombre AS oficina_retiro
+FROM contratosalquiler ca
+JOIN reservas r ON ca.id_reserva = r.id_reserva
+JOIN clientes c ON r.id_cliente = c.id_cliente
+JOIN vehiculos v ON r.id_vehiculo = v.id_vehiculo
+JOIN oficinas o ON v.id_oficina = o.id_oficina;
+CREATE VIEW
+alquilervehiculosdb=# CREATE OR REPLACE FUNCTION crear_vehiculo(matricula TEXT, modelo INT, tipo INT, estado INT, oficina INT, caracteristicas TEXT)
+RETURNS VOID AS $$
+BEGIN
+  INSERT INTO vehiculos (matricula, id_modelo, id_tipo, id_estado, id_oficina, caracteristicas)
+  VALUES (matricula, modelo, tipo, estado, oficina, caracteristicas);
+END;
+$$ LANGUAGE plpgsql;
+CREATE FUNCTION
+alquilervehiculosdb=# CREATE OR REPLACE FUNCTION crear_cliente(nombre TEXT, email TEXT, telefono TEXT, direccion TEXT)
+RETURNS VOID AS $$
+BEGIN
+  INSERT INTO clientes (nombre, email, telefono, direccion)
+  VALUES (nombre, email, telefono, direccion);
+END;
+$$ LANGUAGE plpgsql;
+CREATE FUNCTION
+alquilervehiculosdb=# CREATE OR REPLACE FUNCTION crear_reserva(cliente_id INT, vehiculo_id INT, oficina_retiro INT, oficina_devolucion INT, fecha_ini DATE, fecha_fin DATE)
+RETURNS VOID AS $$
+BEGIN
+  INSERT INTO reservas (id_cliente, id_vehiculo, id_oficina_retiro, id_oficina_devolucion, fecha_inicio, fecha_fin, estado)
+  VALUES (cliente_id, vehiculo_id, oficina_retiro, oficina_devolucion, fecha_ini, fecha_fin, 'Reservado');
+END;
+$$ LANGUAGE plpgsql;
+CREATE FUNCTION
+alquilervehiculosdb=# CREATE OR REPLACE FUNCTION crear_contrato(reserva_id INT, km_inicio INT, km_fin INT, fecha_ent DATE, fecha_dev DATE, seguro_id INT, costo NUMERIC)
+RETURNS VOID AS $$
+BEGIN
+  INSERT INTO contratos_alquiler (id_reserva, kilometraje_inicio, kilometraje_fin, fecha_entrega, fecha_devolucion, id_seguro, costo_total)
+  VALUES (reserva_id, km_inicio, km_fin, fecha_ent, fecha_dev, seguro_id, costo);
+END;
+$$ LANGUAGE plpgsql;
+CREATE FUNCTION
+alquilervehiculosdb=# CREATE OR REPLACE FUNCTION actualizar_estado_vehiculo_alquiler()
+RETURNS TRIGGER AS $$
+BEGIN
+  UPDATE vehiculos SET id_estado = 2 -- Alquilado
+  WHERE id = (SELECT id_vehiculo FROM reservas WHERE id = NEW.id_reserva);
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+CREATE FUNCTION
+alquilervehiculosdb=# CREATE TRIGGER trg_actualizar_estado_alquiler
+AFTER INSERT ON contratosalquiler
+FOR EACH ROW
+EXECUTE FUNCTION actualizar_estado_vehiculo_alquiler();
+CREATE TRIGGER
+alquilervehiculosdb=# CREATE OR REPLACE FUNCTION marcar_vehiculo_disponible()
+RETURNS TRIGGER AS $$
+BEGIN
+  UPDATE vehiculos SET id_estado = 1 -- Disponible
+  WHERE id = (SELECT id_vehiculo FROM reservas WHERE id = NEW.id_reserva);
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+CREATE FUNCTION
+alquilervehiculosdb=# CREATE TRIGGER trg_marcar_disponible
+AFTER UPDATE ON contratos_alquiler
+FOR EACH ROW
+WHEN (NEW.fecha_devolucion IS NOT NULL)
+EXECUTE FUNCTION marcar_vehiculo_disponible();
+ERROR:  relation "contratos_alquiler" does not exist
+alquilervehiculosdb=# CREATE TRIGGER trg_marcar_disponible
+AFTER UPDATE ON contratosalquiler
+FOR EACH ROW
+WHEN (NEW.fecha_fin IS NOT NULL)
+EXECUTE FUNCTION marcar_vehiculo_disponible();
+CREATE TRIGGER
+alquilervehiculosdb=# CREATE TABLE IF NOT EXISTS auditoria_reservas (
+  id SERIAL PRIMARY KEY,
+  id_reserva INT,
+  fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  accion TEXT
+);
+CREATE TABLE
+alquilervehiculosdb=# CREATE OR REPLACE FUNCTION registrar_reserva()
+RETURNS TRIGGER AS $$
+BEGIN
+  INSERT INTO auditoria_reservas (id_reserva, accion)
+  VALUES (NEW.id, 'Nueva reserva');
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+CREATE FUNCTION
+alquilervehiculosdb=# SELECT verificar_disponibilidad(1, 2);
+ERROR:  function verificar_disponibilidad(integer, integer) does not exist
+LINE 1: SELECT verificar_disponibilidad(1, 2);
+               ^
+HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+alquilervehiculosdb=# CREATE OR REPLACE FUNCTION verificar_disponibilidad(oficina_id INT, tipo_id INT)
+RETURNS INT AS $$
+DECLARE
+  cantidad INT;
+BEGIN
+  SELECT COUNT(*) INTO cantidad
+  FROM vehiculos v
+  JOIN estadosvehiculo e ON v.id_estado = e.id_estado
+  WHERE v.id_oficina = oficina_id
+    AND v.id_tipo = tipo_id
+    AND e.estado = 'Disponible';
+
+  RETURN cantidad;
+END;
+$$ LANGUAGE plpgsql;
+CREATE FUNCTION
+alquilervehiculosdb=# CREATE TRIGGER trg_auditoria_reserva
+AFTER INSERT ON reservas
+FOR EACH ROW
+EXECUTE FUNCTION registrar_reserva();
+CREATE TRIGGER
+alquilervehiculosdb=# SELECT v.*, tv.tipo AS tipo, o.nombre AS oficina
+FROM vehiculos v
+JOIN tiposvehiculo tv ON v.id_tipo = tv.id_tipo
+JOIN oficinas o ON v.id_oficina = o.id_oficina
+JOIN estadosvehiculo e ON v.id_estado = e.id_estado
+WHERE e.estado = 'Disponible';
+ id_vehiculo | placa  | id_modelo | id_tipo | anio | color  | id_estado | id_oficina |   tipo    |    oficina
+-------------+--------+-----------+---------+------+--------+-----------+------------+-----------+----------------
+           1 | ABC123 |         1 |       1 | 2020 | Blanco |         1 |          1 | Sedan     | Oficina Centro
+           2 | DEF456 |         2 |       4 | 2019 | Rojo   |         1 |          2 | Hatchback | Oficina Norte
+           5 | MNO345 |         5 |       1 | 2023 | Azul   |         1 |          1 | Sedan     | Oficina Centro
+(3 rows)
+alquilervehiculosdb=# SELECT verificar_disponibilidad(1, 2);
+ verificar_disponibilidad
+--------------------------
+                        0
+(1 row)
+alquilervehiculosdb=# SELECT verificar_disponibilidad(1, 2);
+ verificar_disponibilidad
+--------------------------
+                        0
+(1 row)
+
+alquilervehiculosdb=# SELECT * FROM vista_detalle_contratos;
+ id_contrato | fecha_inicio | fecha_fin  | km_inicial | km_final | costo_total |    observaciones    | cliente | placa  |  oficina_retiro
+-------------+--------------+------------+------------+----------+-------------+---------------------+---------+--------+-------------------
+           4 | 2025-05-06   | 2025-05-12 |      15000 |    15700 |   700000.00 | Todo en orden       | Pedro   | MNO345 | Oficina Centro
+           1 | 2025-05-05   | 2025-05-10 |      12000 |    12400 |   500000.00 | Sin novedades       | Juan    | ABC123 | Oficina Centro
+           2 | 2025-05-07   | 2025-05-09 |       8000 |     8300 |   300000.00 | Cliente frecuente   | Ana     | DEF456 | Oficina Norte
+           5 | 2025-05-04   | 2025-05-06 |      10000 |    10300 |   250000.00 | Cancelado           | Luis    | GHI789 | Sucursal Medellín
+           3 | 2025-05-10   | 2025-05-15 |       5000 |     5600 |   600000.00 | Daño leve en puerta | Carla   | JKL012 | Sucursal Cali
+(5 rows)
+alquilervehiculosdb=# SELECT r.*
+FROM reservas r
+WHERE r.id_cliente = 1 AND CURRENT_DATE BETWEEN r.fecha_inicio AND r.fecha_fin;
+ id_reserva | id_cliente | id_vehiculo | fecha_reserva | fecha_inicio | fecha_fin  |   estado
+------------+------------+-------------+---------------+--------------+------------+------------
+          1 |          1 |           1 | 2025-05-01    | 2025-05-05   | 2025-05-10 | Confirmada
+(1 row)
+alquilervehiculosdb=# SELECT * FROM contratosalquiler
+WHERE fecha_fin = CURRENT_DATE;
+ id_contrato | id_reserva | fecha_inicio | fecha_fin  | km_inicial | km_final | costo_total |   observaciones
+-------------+------------+--------------+------------+------------+----------+-------------+-------------------
+           2 |          2 | 2025-05-07   | 2025-05-09 |       8000 |     8300 |   300000.00 | Cliente frecuente
+(1 row)
+alquilervehiculosdb=# SELECT calcular_costo_alquiler(5, 100000);
+ calcular_costo_alquiler
+-------------------------
+                  500000
+(1 row)
+alquilervehiculosdb=# SELECT v.*
+FROM vehiculos v
+JOIN estadosvehiculo e ON v.id_estado = e.id_estado
+WHERE e.estado = 'Mantenimiento';
+ id_vehiculo | placa  | id_modelo | id_tipo | anio | color | id_estado | id_oficina
+-------------+--------+-----------+---------+------+-------+-----------+------------
+           4 | JKL012 |         4 |       2 | 2022 | Gris  |         3 |          4
+(1 row)
+alquilervehiculosdb=# SELECT c.nombre, COUNT(ca.id_contrato) AS total_alquileres
+FROM clientes c
+JOIN reservas r ON c.id_cliente = r.id_cliente
+JOIN contratosalquiler ca ON r.id_reserva = ca.id_reserva
+GROUP BY c.nombre
+ORDER BY total_alquileres DESC;
+ nombre | total_alquileres
+--------+------------------
+ Ana    |                1
+ Carla  |                1
+ Juan   |                1
+ Luis   |                1
+ Pedro  |                1
+(5 rows)
+alquilervehiculosdb=# SELECT v.placa, e.estado, o.nombre AS oficina
+FROM vehiculos v
+JOIN estadosvehiculo e ON v.id_estado = e.id_estado
+JOIN oficinas o ON v.id_oficina = o.id_oficina;
+ placa  |    estado     |      oficina
+--------+---------------+-------------------
+ DEF456 | Disponible    | Oficina Norte
+ ABC123 | Disponible    | Oficina Centro
+ MNO345 | Disponible    | Oficina Centro
+ GHI789 | Alquilado     | Sucursal Medellín
+ JKL012 | Mantenimiento | Sucursal Cali
+(5 rows)
+alquilervehiculosdb=# WITH historial AS (
+  SELECT r.id_reserva, c.nombre AS cliente, v.placa, ca.fecha_inicio, ca.fecha_fin, ca.costo_total
+  FROM reservas r
+  JOIN clientes c ON r.id_cliente = c.id_cliente
+  JOIN vehiculos v ON r.id_vehiculo = v.id_vehiculo
+  JOIN contratosalquiler ca ON r.id_reserva = ca.id_reserva
+)
+SELECT * FROM historial
+ORDER BY cliente, fecha_inicio;
+ id_reserva | cliente | placa  | fecha_inicio | fecha_fin  | costo_total
+------------+---------+--------+--------------+------------+-------------
+          2 | Ana     | DEF456 | 2025-05-07   | 2025-05-09 |   300000.00
+          4 | Carla   | JKL012 | 2025-05-10   | 2025-05-15 |   600000.00
+          1 | Juan    | ABC123 | 2025-05-05   | 2025-05-10 |   500000.00
+          3 | Luis    | GHI789 | 2025-05-04   | 2025-05-06 |   250000.00
+          5 | Pedro   | MNO345 | 2025-05-06   | 2025-05-12 |   700000.00
+(5 rows)
+alquilervehiculosdb=# WITH disponibles AS (
+  SELECT v.id_tipo, COUNT(*) AS cantidad
+  FROM vehiculos v
+  JOIN estadosvehiculo e ON v.id_estado = e.id_estado
+  WHERE e.estado = 'Disponible' AND v.id_oficina = 1
+  GROUP BY v.id_tipo
+)
+SELECT tv.tipo, d.cantidad
+FROM disponibles d
+JOIN tiposvehiculo tv ON d.id_tipo = tv.id_tipo;
+ tipo  | cantidad
+-------+----------
+ Sedan |        2
+(1 row)
+alquilervehiculosdb=# CREATE ROLE cliente NOINHERIT;
+CREATE ROLE agente_alquiler NOINHERIT;
+CREATE ROLE mecanico NOINHERIT;
+CREATE ROLE admin_flota NOINHERIT;
+CREATE ROLE admin_sistema SUPERUSER CREATEDB CREATEROLE LOGIN;
+CREATE ROLE
+CREATE ROLE
+CREATE ROLE
+CREATE ROLE
+CREATE ROLE
+alquilervehiculosdb=# CREATE USER user_cliente WITH PASSWORD 'cliente123';
+GRANT cliente TO user_cliente;
+
+CREATE USER user_agente WITH PASSWORD 'agente123';
+GRANT agente_alquiler TO user_agente;
+
+CREATE USER user_mecanico WITH PASSWORD 'mecanico123';
+GRANT mecanico TO user_mecanico;
+
+CREATE USER user_flota WITH PASSWORD 'flota123';
+GRANT admin_flota TO user_flota;
+
+CREATE USER user_admin WITH PASSWORD 'admin123';
+GRANT admin_sistema TO user_admin;
+CREATE ROLE
+GRANT ROLE
+CREATE ROLE
+GRANT ROLE
+CREATE ROLE
+GRANT ROLE
+CREATE ROLE
+GRANT ROLE
+CREATE ROLE
+GRANT ROLE
+alquilervehiculosdb=# GRANT SELECT ON reservas TO cliente;
+GRANT SELECT ON contratosalquiler TO cliente;
+GRANT
+GRANT
+alquilervehiculosdb=# GRANT SELECT, INSERT, UPDATE ON reservas TO agente_alquiler;
+GRANT SELECT, INSERT, UPDATE ON contratosalquiler TO agente_alquiler;
+GRANT
+GRANT
+alquilervehiculosdb=# GRANT SELECT, INSERT, UPDATE ON vehiculos TO mecanico;
+GRANT SELECT, INSERT, UPDATE ON mantenimientos TO mecanico;
+GRANT
+GRANT
+alquilervehiculosdb=# GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO admin_flota;
+GRANT
+alquilervehiculosdb=# GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO admin_flota, agente_alquiler, mecanico;
+GRANT
+alquilervehiculosdb=# REVOKE ALL ON SCHEMA public FROM PUBLIC;
+REVOKE
+alquilervehiculosdb=# \dt
+              List of relations
+ Schema |        Name        | Type  | Owner
+--------+--------------------+-------+--------
+ public | auditoria_reservas | table | grupo2
+ public | clientes           | table | grupo2
+ public | contratosalquiler  | table | grupo2
+ public | estadosvehiculo    | table | grupo2
+ public | mantenimientos     | table | grupo2
+ public | marcas             | table | grupo2
+ public | modelos            | table | grupo2
+ public | oficinas           | table | grupo2
+ public | reservas           | table | grupo2
+ public | rolesusuario       | table | grupo2
+ public | seguros            | table | grupo2
+ public | tarifas            | table | grupo2
+ public | tiposvehiculo      | table | grupo2
+ public | usuarios           | table | grupo2
+ public | vehiculos          | table | grupo2
+ public | vehiculoseguro     | table | grupo2
+(16 rows)
+
+alquilervehiculosdb=# SELECT * FROM auditoria_reservas;
+ id | id_reserva | fecha | accion
+----+------------+-------+--------
+(0 rows)
+
+alquilervehiculosdb=# SELECT * FROM clientes;
+ id_cliente | nombre | apellido  |   cedula   |       correo       |  telefono  |    direccion
+------------+--------+-----------+------------+--------------------+------------+------------------
+          1 | Juan   | Pérez     | 1234567890 | juanp@example.com  | 3001112233 | Calle 1 #2-3
+          2 | Ana    | Gómez     | 2345678901 | anag@example.com   | 3002223344 | Cra 5 #6-7
+          3 | Luis   | Martínez  | 3456789012 | luism@example.com  | 3003334455 | Av 10 #20-30
+          4 | Carla  | Rodríguez | 4567890123 | carlar@example.com | 3004445566 | Calle 50 #60-70
+          5 | Pedro  | Sánchez   | 5678901234 | pedros@example.com | 3005556677 | Cra 100 #110-120
+(5 rows)
+
+alquilervehiculosdb=# SELECT * FROM contratosalquiler;
+ id_contrato | id_reserva | fecha_inicio | fecha_fin  | km_inicial | km_final | costo_total |    observaciones
+-------------+------------+--------------+------------+------------+----------+-------------+---------------------
+           1 |          1 | 2025-05-05   | 2025-05-10 |      12000 |    12400 |   500000.00 | Sin novedades
+           2 |          2 | 2025-05-07   | 2025-05-09 |       8000 |     8300 |   300000.00 | Cliente frecuente
+           3 |          4 | 2025-05-10   | 2025-05-15 |       5000 |     5600 |   600000.00 | Daño leve en puerta
+           4 |          5 | 2025-05-06   | 2025-05-12 |      15000 |    15700 |   700000.00 | Todo en orden
+           5 |          3 | 2025-05-04   | 2025-05-06 |      10000 |    10300 |   250000.00 | Cancelado
+(5 rows)
+
+alquilervehiculosdb=# SELECT * FROM estadosvehiculo;
+ id_estado |    estado
+-----------+---------------
+         1 | Disponible
+         2 | Alquilado
+         3 | Mantenimiento
+         4 | Reservado
+         5 | Inactivo
+(5 rows)
+
+alquilervehiculosdb=# SELECT * FROM mantenimientos;
+ id_mantenimiento | id_vehiculo |   fecha    |    descripcion    |   costo   | realizado_por
+------------------+-------------+------------+-------------------+-----------+---------------
+                1 |           3 | 2025-04-15 | Cambio de aceite  |  80000.00 | Mecánico A
+                2 |           4 | 2025-04-18 | Cambio de frenos  | 150000.00 | Mecánico B
+                3 |           2 | 2025-04-20 | Revisión general  |  50000.00 | Mecánico C
+                4 |           5 | 2025-04-22 | Cambio de llantas | 300000.00 | Mecánico A
+                5 |           1 | 2025-04-25 | Lavado interno    |  20000.00 | Mecánico D
+(5 rows)
+
+alquilervehiculosdb=# SELECT * FROM marcas;
+ id_marca |  nombre
+----------+-----------
+        1 | Toyota
+        2 | Chevrolet
+        3 | Ford
+        4 | Hyundai
+        5 | Nissan
+(5 rows)
+
+alquilervehiculosdb=# SELECT * FROM modelos;
+ id_modelo |  nombre  | id_marca
+-----------+----------+----------
+         1 | Corolla  |        1
+         2 | Spark GT |        2
+         3 | F-150    |        3
+         4 | Tucson   |        4
+         5 | Versa    |        5
+(5 rows)
+
+alquilervehiculosdb=# SELECT * FROM oficinas;
+ id_oficina |        nombre         |       direccion       |    ciudad    |  telefono
+------------+-----------------------+-----------------------+--------------+------------
+          1 | Oficina Centro        | Calle 10 #15-30       | Bogotá       | 6011234567
+          2 | Oficina Norte         | Cra 45 #120-90        | Bogotá       | 6012345678
+          3 | Sucursal Medellín     | Av. El Poblado #35-50 | Medellín     | 6043456789
+          4 | Sucursal Cali         | Cra 70 #45-60         | Cali         | 6024567890
+          5 | Sucursal Barranquilla | Calle 80 #50-10       | Barranquilla | 6055678901
+(5 rows)
+
+alquilervehiculosdb=# SELECT * FROM reservas;
+ id_reserva | id_cliente | id_vehiculo | fecha_reserva | fecha_inicio | fecha_fin  |   estado
+------------+------------+-------------+---------------+--------------+------------+------------
+          1 |          1 |           1 | 2025-05-01    | 2025-05-05   | 2025-05-10 | Confirmada
+          2 |          2 |           2 | 2025-05-02    | 2025-05-07   | 2025-05-09 | Pendiente
+          3 |          3 |           3 | 2025-05-03    | 2025-05-04   | 2025-05-06 | Cancelada
+          4 |          4 |           4 | 2025-05-04    | 2025-05-10   | 2025-05-15 | Confirmada
+          5 |          5 |           5 | 2025-05-05    | 2025-05-06   | 2025-05-12 | Confirmada
+(5 rows)
+
+alquilervehiculosdb=# SELECT * FROM rolesusuario;
+ id_rol |   nombre_rol
+--------+-----------------
+      1 | cliente
+      2 | agente_alquiler
+      3 | mecanico
+      4 | admin_flota
+      5 | admin_sistema
+(5 rows)
+
+alquilervehiculosdb=# SELECT * FROM seguros;
+ id_seguro |   nombre   |                descripcion                |  precio
+-----------+------------+-------------------------------------------+-----------
+         1 | Básico     | Cobertura contra daños menores            |  50000.00
+         2 | Total      | Cobertura total de daños                  | 100000.00
+         3 | Robo       | Cobertura contra hurto del vehículo       |  75000.00
+         4 | Accidentes | Cobertura contra accidentes personales    |  60000.00
+         5 | Mixto      | Cobertura contra todo riesgo y accidentes | 120000.00
+(5 rows)
+
+alquilervehiculosdb=# SELECT * FROM tarifas;
+ id_tarifa | id_tipo | precio_dia | temporada
+-----------+---------+------------+-----------
+         1 |       1 |   80000.00 | Alta
+         2 |       1 |   60000.00 | Baja
+         3 |       2 |  100000.00 | Media
+         4 |       3 |  120000.00 | Alta
+         5 |       4 |   70000.00 | Media
+(5 rows)
+
+alquilervehiculosdb=# SELECT * FROM tiposvehiculo;
+ id_tipo |   tipo
+---------+-----------
+       1 | Sedan
+       2 | SUV
+       3 | Camioneta
+       4 | Hatchback
+       5 | Pickup
+(5 rows)
+
+alquilervehiculosdb=# SELECT * FROM usuarios;
+ id_usuario |   username   | password | id_rol
+------------+--------------+----------+--------
+          1 | juancliente  | pass123  |      1
+          2 | anaagente    | pass234  |      2
+          3 | luismec      | pass345  |      3
+          4 | adminflota1  | pass456  |      4
+          5 | sistemaadmin | pass567  |      5
+(5 rows)
+
+alquilervehiculosdb=# SELECT * FROM vehiculos;
+ id_vehiculo | placa  | id_modelo | id_tipo | anio | color  | id_estado | id_oficina
+-------------+--------+-----------+---------+------+--------+-----------+------------
+           1 | ABC123 |         1 |       1 | 2020 | Blanco |         1 |          1
+           2 | DEF456 |         2 |       4 | 2019 | Rojo   |         1 |          2
+           3 | GHI789 |         3 |       5 | 2021 | Negro  |         2 |          3
+           4 | JKL012 |         4 |       2 | 2022 | Gris   |         3 |          4
+           5 | MNO345 |         5 |       1 | 2023 | Azul   |         1 |          1
+(5 rows)
+
+alquilervehiculosdb=# SELECT * FROM vehiculoseguro;
+ id_vehiculo | id_seguro
+-------------+-----------
+           1 |         1
+           1 |         2
+           2 |         3
+           3 |         2
+           4 |         4
+(5 rows)
